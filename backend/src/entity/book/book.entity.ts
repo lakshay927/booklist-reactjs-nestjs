@@ -14,13 +14,12 @@ export class Book {
   @ApiProperty()
   title: string;
 
-  @Column({ length: 100 })
-  @ApiProperty()
-  author: string;
-
   @Column('float')
   @ApiProperty()
   price: number;
+
+  @Column('float')
+  discount: number;
 
   @OneToMany(() => Purchase, (purchase) => purchase.book)
   @ApiProperty({ type: () => Purchase, isArray: true }) // specify type if NestJS can't infer it

@@ -11,15 +11,33 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     EntityModule,
     ServiceModule,
     ControllerModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'pass',
-      database: 'booklist',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        const requiredEnvVars = [
+          'DB_HOST',
+          'DB_PORT',
+          'DB_USERNAME',
+          'DB_PASSWORD',
+          'DB_DATABASE',
+        ];
+        for (const envVar of requiredEnvVars) {
+          if (!process.env[envVar]) {
+            throw new Error(
+              `${envVar} is not defined in the environment variables.`,
+            );
+          }
+        }
+        return {
+          type: 'postgres',
+          host: process.env.DB_HOST,
+          port: +process.env.DB_PORT,
+          username: process.env.DB_USERNAME,
+          password: process.env.DB_PASSWORD,
+          database: process.env.DB_DATABASE,
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+        };
+      },
     }),
   ],
   controllers: [AppController],
